@@ -1,0 +1,3 @@
+function playBtn() {
+　return "OK";
+}
