@@ -12,27 +12,46 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-
-//  textファイルの数をカウント
-const files = fs.readdirSync('./data/text');
-const fileCount = files.length - 1;
-
-
-
 app.use(index);
 app.use(express.static(path.join(__dirname, 'public')));
 
 var i = 0;
-var j = 0;
+var boxnum = 0;
+
+const slide1 = JSON.parse(fs.readFileSync('./data/slide.json', 'utf-8'));
+
+// var a = new Array();
+// var obj = {}
 
 io.sockets.on('connection', function (socket) {
     i = 0;//　リロード時に0から読み込むため
+    a = [];
 
-    while (i <= fileCount) {
-        text = fs.readFileSync('./data/text/' + i + '.txt', 'utf-8');
-        socket.emit('Textfile_number', i, text);
-        i += 1;
-    }
+    doJsonCommands('./data/slide.json');
+
+    socket.on('addForm', () => {
+        console.log("Add");
+        json_add_newdata(slide1, i, "undesign");
+        socket.emit('addform', i);
+        console.log(slide1);
+        i++;
+        boxnum++;
+    });
+
+    socket.on('addForm_design', () => {
+        console.log("Add");
+        json_add_newdata(slide1, i, "design");
+        socket.emit('addform_design', i);
+        console.log(slide1);
+        i++;
+        boxnum++;
+    });
+
+    socket.on('delete_json', (index) => {
+        json_delete_data(slide1, index);
+        console.log(slide1);
+        boxnum--;
+    });
 
     socket.on('changeText', (text, id) => {
         console.log("CHANGE TEXT")
@@ -62,17 +81,29 @@ io.sockets.on('connection', function (socket) {
         });
     })
 
-    socket.on('addForm', () => {
-        socket.emit("addform", i);
-        i += 1;
-    })
-
-    socket.on('addForm_design', () => {
-        socket.emit("addform_design", j);
-        j += 1;
-    })
+    function doJsonCommands(jsonPath) {
+        const jsonObject = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+        for (const obj of jsonObject) {
+            if (obj.text != null) {
+                socket.emit('Textload', obj.text, obj.flag, i);
+            } else {
+                console.log("undefined command : " + obj.command);
+            }
+            i++;
+        }
+    }
 
 });
+
+function json_add_newdata(target_data, i, flag){
+    var new_data = {id: i, flag: flag};
+    target_data.push(new_data)
+
+}
+
+function json_delete_data(target_data, i){
+    delete target_data.splice(i, 1);
+}
 
 
 server.listen(port, hostname, () => {

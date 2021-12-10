@@ -14,6 +14,7 @@
     <script src="js/mv.js"></script>
     <script src="js/play.js"></script>
     <script src="js/addform.js"></script>
+    <script src="js/windowcmd.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <!-- javascriptのファイル名 -->
 
@@ -47,24 +48,13 @@
 
     <section>
         <div id="form_area" class="form">
-            <!-- <p class="time_write" id="timetext_0">0:00~0:10</p>
-            <textarea id="inputform_0" class="text" value="" cols="100" rows="5"></textarea>
-            <select name="motion" id="select_0" class="select">
-                <option value="サンプル1">サンプル1</option>
-                <option value="サンプル2">サンプル2</option>
-                <option value="サンプル3">サンプル3</option>
-            </select>
-            <input type="number" class="number" id="number_0" name="number0" max="10" min="0" step="0.1"
-                placeholder="開始時間">
-            <input type="number" class="number" id="numberf_0" name="numberf0" max="10" min="0" step="0.1"
-                placeholder="終了時間">
-            <button class="playB" id="playB_0" onclick="playBtn(this)">再生</button>
-            <button class="deleteB" id="0" onclick="deleteBtn(this)">削除</button> -->
-
         </div>
         <input type="button" value="追加" onclick="addBtn()">
         <input type="button" value="デザイン追加" onclick="addForm_designBtn()">
-        <!-- <input type="button" value="text保存" onclick="textSave()"> -->
+
+        <button type=“button” href="javascript:void(0);"
+            onclick="openWindow1('subWindow.html', 'child_window1')">ページリンク</button>
+        <!-- <p><a href="javascript:void(0);" onclick="openWindow1('subWindow.html', 'child_window1')">子ウィンドウ１を開く</a></p> -->
     </section>
 
     <script type="text/javascript">
@@ -93,14 +83,22 @@
             socket.emit("addForm");
         }
 
-        function addForm_designBtn(){
+        function addForm_designBtn() {
             socket.emit("addForm_design");
         }
 
-        socket.on('Textfile_number', (i, text) => {
-            addForm(i);
-            var a = document.getElementById('notd_inputform_' + i);
-            a.value = text;
+        socket.on('Textload', (text, flag, i) => {
+            if (flag == "design") {
+                addForm_design(i);
+                console.log("design");
+            }
+            else {
+                addForm(i)
+                console.log("undesign");
+            }
+            var target = document.getElementById(i);
+            a = target.children;
+            a[0].value = text;
         })
 
         socket.on('addform', (i) => {
@@ -110,6 +108,24 @@
         socket.on('addform_design', (j) => {
             addForm_design(j);
         })
+
+        function deleteBtn(target) {
+            var target_id = target.id;
+            var target = document.getElementById(target_id);
+            var parent = target.parentElement;
+            var bigparent = document.getElementById('form_area');
+            // 指定したclass名の要素の集合（HTMLCollection）を取得
+            var boxes = document.getElementsByClassName("box");
+            // 要素の集合を配列に変換
+            var arrayboxes = Array.prototype.slice.call(boxes);
+            var index = arrayboxes.indexOf( parent );
+            
+            socket.emit('delete_json', index);
+            console.log(arrayboxes);
+            console.log(index);
+
+            bigparent.removeChild(parent);
+        }
     </script>
 
 
