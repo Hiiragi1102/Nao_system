@@ -1,6 +1,6 @@
 @charset "utf-8";
 
-body {
+/* body {
 	font-family: arial, helvetica, sans-serif;
 	font-size: 13px;
 }
@@ -11,7 +11,7 @@ div {
 
 p {
 	padding: 8px 4px;
-}
+} */
 
 h1 {
 	display: block;
@@ -25,14 +25,14 @@ h1 {
 	padding: 4px;
 	margin: 2px;
 	border: #eee 1px solid;
-	width: 480px;
+	width: auto;
 }
 
 textarea {
 	position: relative;
 	background: transparent;
-	height: 120px;
-	width: 480px;
+	height: auto;
+	width: auto;
 	resize: none;
 	overflow: hidden;
 	border: none;

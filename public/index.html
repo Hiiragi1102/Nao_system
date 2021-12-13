@@ -5,8 +5,11 @@
     <meta charset="utf-8">
     <title>プレゼン動作のデザイン</title>
     <meta name="description" content="実験用のUI">
+    <meta http-equiv="content-type">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/hashtag.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src='python/libqi-js/libs/qimessaging/1.0/qimessaging.js'></script>
 
@@ -14,6 +17,7 @@
     <script src="js/mv.js"></script>
     <script src="js/play.js"></script>
     <script src="js/addform.js"></script>
+    <script src="js/jquery.hashtag.js"></script>
     <script src="js/windowcmd.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <!-- javascriptのファイル名 -->
@@ -27,6 +31,7 @@
 
     <!----- main ----->
     <!-- <h1>タイトル</h1> -->
+    
     <section>
 
         <div class="g-slide">
@@ -47,15 +52,24 @@
     </section>
 
     <section>
-        <div id="form_area" class="form">
+        <div class="container">
+            <textarea cols="100" rows="5" id="textarea1"></textarea>
         </div>
-        <input type="button" value="追加" onclick="addBtn()">
+
+
+        <!-- <input type="button" value="追加" onclick="addBtn()">
         <input type="button" value="デザイン追加" onclick="addForm_designBtn()">
 
-        <button type=“button” href="javascript:void(0);"
-            onclick="openWindow1('subWindow.html', 'child_window1')">ページリンク</button>
+        <button type="button" href="javascript:void(0);"
+            onclick="openWindow1('subWindow.html', 'child_window1')">ページリンク</button> -->
         <!-- <p><a href="javascript:void(0);" onclick="openWindow1('subWindow.html', 'child_window1')">子ウィンドウ１を開く</a></p> -->
     </section>
+
+    <script>
+        jQuery(function () {
+            jQuery("textarea").hashtag();
+        });
+    </script>
 
     <script type="text/javascript">
         var socket = io.connect();
@@ -65,67 +79,67 @@
             pythonOptions: ['-u'],
         };
 
-        function textSave(target) {
-            var sbtnid = target.id;
-            var id = sbtnid.replace("saveB_", "");
-            var element = document.getElementById('inputform_' + id);
-            var text = element.value;
-            socket.emit("changeText", text, id);
-        }
+        // function textSave(target) {
+        //     var sbtnid = target.id;
+        //     var id = sbtnid.replace("saveB_", "");
+        //     var element = document.getElementById('inputform_' + id);
+        //     var text = element.value;
+        //     socket.emit("changeText", text, id);
+        // }
 
-        function playBtn(target) {
-            var pbtnid = target.id;
-            var id = pbtnid.replace("playB_", "");
-            socket.emit("moveNao", id);
-        }
+        // function playBtn(target) {
+        //     var pbtnid = target.id;
+        //     var id = pbtnid.replace("playB_", "");
+        //     socket.emit("moveNao", id);
+        // }
 
-        function addBtn() {
-            socket.emit("addForm");
-        }
+        // function addBtn() {
+        //     socket.emit("addForm");
+        // }
 
-        function addForm_designBtn() {
-            socket.emit("addForm_design");
-        }
+        // function addForm_designBtn() {
+        //     socket.emit("addForm_design");
+        // }
 
-        socket.on('Textload', (text, flag, i) => {
-            if (flag == "design") {
-                addForm_design(i);
-                console.log("design");
-            }
-            else {
-                addForm(i)
-                console.log("undesign");
-            }
-            var target = document.getElementById(i);
-            a = target.children;
-            a[0].value = text;
-        })
+        // socket.on('Textload', (text, flag, i) => {
+        //     if (flag == "design") {
+        //         addForm_design(i);
+        //         console.log("design");
+        //     }
+        //     else {
+        //         addForm(i)
+        //         console.log("undesign");
+        //     }
+        //     var target = document.getElementById(i);
+        //     a = target.children;
+        //     a[0].value = text;
+        // })
 
-        socket.on('addform', (i) => {
-            addForm(i);
-        })
+        // socket.on('addform', (i) => {
+        //     addForm(i);
+        // })
 
-        socket.on('addform_design', (j) => {
-            addForm_design(j);
-        })
+        // socket.on('addform_design', (j) => {
+        //     addForm_design(j);
+        // })
 
-        function deleteBtn(target) {
-            var target_id = target.id;
-            var target = document.getElementById(target_id);
-            var parent = target.parentElement;
-            var bigparent = document.getElementById('form_area');
-            // 指定したclass名の要素の集合（HTMLCollection）を取得
-            var boxes = document.getElementsByClassName("box");
-            // 要素の集合を配列に変換
-            var arrayboxes = Array.prototype.slice.call(boxes);
-            var index = arrayboxes.indexOf( parent );
-            
-            socket.emit('delete_json', index);
-            console.log(arrayboxes);
-            console.log(index);
+        // function deleteBtn(target) {
+        //     var target_id = target.id;
+        //     var target = document.getElementById(target_id);
+        //     var parent = target.parentElement;
+        //     var bigparent = document.getElementById('form_area');
+        //     // 指定したclass名の要素の集合（HTMLCollection）を取得
+        //     var boxes = document.getElementsByClassName("box");
+        //     // 要素の集合を配列に変換
+        //     var arrayboxes = Array.prototype.slice.call(boxes);
+        //     var index = arrayboxes.indexOf(parent);
 
-            bigparent.removeChild(parent);
-        }
+        //     socket.emit('delete_json', index);
+        //     console.log(arrayboxes);
+        //     console.log(index);
+
+        //     bigparent.removeChild(parent);
+        // }
     </script>
 
 

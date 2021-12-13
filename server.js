@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 var i = 0;
 var boxnum = 0;
 
-const slide1 = JSON.parse(fs.readFileSync('./data/slide.json', 'utf-8'));
+const slide1 = JSON.parse(fs.readFileSync('./data/json/slide.json', 'utf-8'));
 
 // var a = new Array();
 // var obj = {}
@@ -27,7 +27,7 @@ io.sockets.on('connection', function (socket) {
     i = 0;//　リロード時に0から読み込むため
     a = [];
 
-    doJsonCommands('./data/slide.json');
+    doJsonCommands('./data/json/slide.json');
 
     socket.on('addForm', () => {
         console.log("Add");

@@ -25,12 +25,43 @@
 				refresh: function () {
 					var selection = window.getSelection()
 					var re = selection.toString(), v = $elem.val();
-					// var keep = 
-					var escaped = $('<div>').text(v).html();
-					console.log(re);
-					console.log(v);
-					console.log(escaped);
-					var html = escaped.replace(re, '<b>' + re + '</b>');
+					var element = document.getElementById("textarea1");
+					var not_tag = 0;
+					var tag = 0;
+					var old = $('span').html();
+					var keep, replace, html;
+
+					if (old == "") {
+						keep = v.slice(0, element.selectionStart)
+						replace = v.slice(element.selectionStart);
+						html = keep + replace.replace(re, '<b>' + re + '</b>');
+						return this.children('span').html(html).end();
+					}
+					else {
+						for (var i = 0; i < element.selectionStart + tag; i++) {
+							if (old[i] == '<') {
+								tag++;
+								while (old[i] != '>') {
+									i++;
+									tag++;
+								}
+							}
+							else {
+								console.log(old[i]);
+								not_tag += 1;
+							}
+						}
+
+						keep = old.slice(0, i)
+						replace = old.slice(i);
+						html = keep + replace.replace(re, '<b>' + re + '</b>');
+						return this.children('span').html(html).end();
+					}
+				},
+				refresh2: function () {
+					var v = $elem.val();
+					var old = $('span').html();
+					var html = $('<div>').text(v).html();
 					return this.children('span').html(html).end();
 				}
 			},
@@ -45,6 +76,13 @@
 				if (selectedStr !== '' && selectedStr !== '\n') {  //文章チェック
 					$div.refresh();
 				}
+			},
+			update2: function () {
+				var curval = $elem.val();
+				var element = document.getElementById("textarea1");
+				console.log(element.selectionStart);
+				console.log(element.selectionEnd);
+				$div.refresh2();
 			}
 		};
 	};
@@ -57,8 +95,13 @@
 			var layer = underlay(textarea);
 
 			$(function () {
-				// $($elem).mouseup(upFunc);
 				$($elem).on('mouseup' + evtsuffix, $.proxy(layer.update, layer));
+			});
+
+
+			var events = ['keydown', 'keyup', 'keypress', 'change']
+			$.each(events, function (i, evt) {
+				$elem.on(evt + evtsuffix, $.proxy(layer.update2, layer));
 			});
 
 			// リサイズではなく、高さを自動拡張する
