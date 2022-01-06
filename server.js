@@ -20,16 +20,8 @@ const options = {
     pythonOptions: ['-u'],
 };
 
-const pyshell_speak = new PythonShell('./public/python/speak.py', options);
-
-
 app.use(index);
 app.use(express.static(path.join(__dirname, 'public')));
-
-const slide1 = JSON.parse(fs.readFileSync('./data/json/slide.json', 'utf-8'));
-
-// var a = new Array();
-// var obj = {}
 
 io.sockets.on('connection', function (socket) {
     socket.on('jsonSave', (data) => {
@@ -48,34 +40,30 @@ io.sockets.on('connection', function (socket) {
 
 async function run_Nao() {
     let i = 0;
+    let motion;
     const jsonslide = JSON.parse(fs.readFileSync('./data/json/slide1.json', 'utf-8'));
-    const jsonlen = jsonslide.length;
 
     for await (let obj of jsonslide) {
         if (obj.inte == "") {
-            console.log("s1");
-            await nomotion(i);
-        } else if (obj.inte == "int1") {
-            if (obj.motion == "motion1") {
-                console.log("s2");
-                await motion1(i);
-            }
+            motion = "speak";
+        } else if (obj.motion == "motion1") {
+            motion = "motion1";
         }
+        await nao_motion(i, motion);
         i++;
     }
 }
 
-async function nomotion(i) {
-    const pyshell_speak = new PythonShell('./public/python/speak.py', options);
-
-
+async function nao_motion(i, motion) {
+    const jsonslide = JSON.parse(fs.readFileSync('./data/json/slide1.json', 'utf-8'));
+    const pyshell = new PythonShell('./public/python/' + motion + '.py', options);
     const jsonslide = JSON.parse(fs.readFileSync('./data/json/slide1.json', 'utf-8'));
     const text = jsonslide[i].text;
-    const num = jsonslide[i].end - jsonslide[i].start;
+    const num = jsonslide[i].end - jsonslide[i].start + 1;
     let spokenflag = false;
     console.log(text);
-    pyshell_speak.send(text);
-    pyshell_speak.on('message', function (data) {
+    pyshell.send(text);
+    pyshell.on('message', function (data) {
         data = data.replace(/\r?\n/g, '');
         console.log("nomotion:" + data);
         if (data == "spoken") {
@@ -91,40 +79,40 @@ async function nomotion(i) {
                 clearInterval(timer);
                 resolve("fin1");
             }
-        }, 1000)
+        },500)
     });
 }
 
-async function motion1(i) {
-    const pyshell_speak = new PythonShell('./public/python/speak.py', options);
+// async function motion1(i) {
+//     const pyshell_speak = new PythonShell('./public/python/speak.py', options);
 
 
-    const jsonslide = JSON.parse(fs.readFileSync('./data/json/slide1.json', 'utf-8'));
-    const text = jsonslide[i].text;
-    const num = jsonslide[i].end - jsonslide[i].start;
-    let spokenflag = false;
+//     const jsonslide = JSON.parse(fs.readFileSync('./data/json/slide1.json', 'utf-8'));
+//     const text = jsonslide[i].text;
+//     const num = jsonslide[i].end - jsonslide[i].start;
+//     let spokenflag = false;
 
-    console.log(text);
-    pyshell_speak.send(text);
-    pyshell_speak.on('message', function (data) {
-        data = data.replace(/\r?\n/g, '');
-        console.log("motion1:" + data + "sss");
-        if (data == "spoken") {
-            spokenflag = true;
-            console.log("話したよ‼");
-        }
-    });
-    return new Promise(resolve => {
-        const timer = setInterval(() => {
-            console.log("loop2:" + spokenflag);
-            if (spokenflag) {
-                console.log("clear");
-                clearInterval(timer);
-                resolve("fin2");
-            }
-        }, 1000)
-    });
-}
+//     console.log(text);
+//     pyshell_speak.send(text);
+//     pyshell_speak.on('message', function (data) {
+//         data = data.replace(/\r?\n/g, '');
+//         console.log("motion1:" + data + "sss");
+//         if (data == "spoken") {
+//             spokenflag = true;
+//             console.log("話したよ‼");
+//         }
+//     });
+//     return new Promise(resolve => {
+//         const timer = setInterval(() => {
+//             console.log("loop2:" + spokenflag);
+//             if (spokenflag) {
+//                 console.log("clear");
+//                 clearInterval(timer);
+//                 resolve("fin2");
+//             }
+//         }, 1000)
+//     });
+// }
 
 
 

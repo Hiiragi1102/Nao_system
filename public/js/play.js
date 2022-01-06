@@ -1,3 +1,0 @@
-function playBtn() {
-　return "OK";
-}

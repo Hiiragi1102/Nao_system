@@ -8,8 +8,8 @@ class Nao_design {
     }
 }
 
-var nao_design = [];
-var nao_deform = [];
+let nao_design = [];
+let nao_deform = [];
 
 function design() {
     var element = document.getElementById("textarea1");
@@ -151,6 +151,15 @@ function tojson() {
                     });
                     return this.children('.Layer').html(html).end();
                 },
+
+                // changeval: function (oldval, curval) {
+                //     var oldlen = oldval.length;
+                //     var curlen = curval.length;
+                //     if (oldlen - curlen > 0) {
+
+                //     }
+                // },
+
                 deleteMark: function () {
                     var i = 0, j = 0;
                     var val = $elem.val();
@@ -213,6 +222,7 @@ function tojson() {
                 var curval = $elem.val();
                 if (curval !== oldval) {
                     $div.deleteMark();
+                    // $div.changeval(oldval, curval);
                     $div.refresh();
                     oldval = curval;
                 }
