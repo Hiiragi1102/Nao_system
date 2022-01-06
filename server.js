@@ -12,11 +12,19 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+const options = {
+    mode: 'text', // textもしくはjson
+    pythonPath: 'C:/Python27/python.exe',
+    pythonOptions: ['-u'],
+};
+
+const pyshell_speak = new PythonShell('./public/python/speak.py', options);
+
+
 app.use(index);
 app.use(express.static(path.join(__dirname, 'public')));
-
-var i = 0;
-var boxnum = 0;
 
 const slide1 = JSON.parse(fs.readFileSync('./data/json/slide.json', 'utf-8'));
 
@@ -24,84 +32,109 @@ const slide1 = JSON.parse(fs.readFileSync('./data/json/slide.json', 'utf-8'));
 // var obj = {}
 
 io.sockets.on('connection', function (socket) {
-    i = 0;//　リロード時に0から読み込むため
-    a = [];
-
-    doJsonCommands('./data/json/slide.json');
-
-    socket.on('addForm', () => {
-        console.log("Add");
-        json_add_newdata(slide1, i, "undesign");
-        socket.emit('addform', i);
-        console.log(slide1);
-        i++;
-        boxnum++;
-    });
-
-    socket.on('addForm_design', () => {
-        console.log("Add");
-        json_add_newdata(slide1, i, "design");
-        socket.emit('addform_design', i);
-        console.log(slide1);
-        i++;
-        boxnum++;
-    });
-
-    socket.on('delete_json', (index) => {
-        json_delete_data(slide1, index);
-        console.log(slide1);
-        boxnum--;
-    });
-
-    socket.on('changeText', (text, id) => {
+    socket.on('jsonSave', (data) => {
         console.log("CHANGE TEXT")
-        fs.writeFileSync('data/text/' + id + '.txt', text, (err) => {
+        fs.writeFileSync('data/json/slide1.json', data, (err) => {
             if (err) throw err;
             console.log('false');
         });
     })
 
-    socket.on('moveNao', (id) => {
-
-        text = fs.readFileSync('./data/text/' + id + '.txt', 'utf-8');
-        console.log(text);
-
-        var options = {
-            mode: 'text', // textもしくはjson
-            pythonPath: 'C:/Python27/python.exe',
-            pythonOptions: ['-u'],
-        };
-        var pyshell = new PythonShell('./python/sample.py', options);
-
-        pyshell.send(text);
-
-        console.log("MOVE NAO")
-        pyshell.on('message', function (data) {
-            console.log(data);
-        });
+    socket.on('moveNao', () => {
+        run_Nao()
+        console.log("play2");
     })
-
-    function doJsonCommands(jsonPath) {
-        const jsonObject = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
-        for (const obj of jsonObject) {
-            if (obj.text != null) {
-                socket.emit('Textload', obj.text, obj.flag, i);
-            } else {
-                console.log("undefined command : " + obj.command);
-            }
-            i++;
-        }
-    }
-
 });
 
-function json_add_newdata(target_data, i, flag){
-    var new_data = {id: i, flag: flag};
+async function run_Nao() {
+    let i = 0;
+    const jsonslide = JSON.parse(fs.readFileSync('./data/json/slide1.json', 'utf-8'));
+    const jsonlen = jsonslide.length;
+
+    for await (let obj of jsonslide) {
+        if (obj.inte == "") {
+            console.log("s1");
+            await nomotion(i);
+        } else if (obj.inte == "int1") {
+            if (obj.motion == "motion1") {
+                console.log("s2");
+                await motion1(i);
+            }
+        }
+        i++;
+    }
+}
+
+async function nomotion(i) {
+    const pyshell_speak = new PythonShell('./public/python/speak.py', options);
+
+
+    const jsonslide = JSON.parse(fs.readFileSync('./data/json/slide1.json', 'utf-8'));
+    const text = jsonslide[i].text;
+    const num = jsonslide[i].end - jsonslide[i].start;
+    let spokenflag = false;
+    console.log(text);
+    pyshell_speak.send(text);
+    pyshell_speak.on('message', function (data) {
+        data = data.replace(/\r?\n/g, '');
+        console.log("nomotion:" + data);
+        if (data == "spoken") {
+            spokenflag = true;
+            console.log("話したよ‼");
+        }
+    });
+    return new Promise(resolve => {
+        const timer = setInterval(() => {
+            console.log("loop1:" + spokenflag);
+            if (spokenflag) {
+                console.log("clear");
+                clearInterval(timer);
+                resolve("fin1");
+            }
+        }, 1000)
+    });
+}
+
+async function motion1(i) {
+    const pyshell_speak = new PythonShell('./public/python/speak.py', options);
+
+
+    const jsonslide = JSON.parse(fs.readFileSync('./data/json/slide1.json', 'utf-8'));
+    const text = jsonslide[i].text;
+    const num = jsonslide[i].end - jsonslide[i].start;
+    let spokenflag = false;
+
+    console.log(text);
+    pyshell_speak.send(text);
+    pyshell_speak.on('message', function (data) {
+        data = data.replace(/\r?\n/g, '');
+        console.log("motion1:" + data + "sss");
+        if (data == "spoken") {
+            spokenflag = true;
+            console.log("話したよ‼");
+        }
+    });
+    return new Promise(resolve => {
+        const timer = setInterval(() => {
+            console.log("loop2:" + spokenflag);
+            if (spokenflag) {
+                console.log("clear");
+                clearInterval(timer);
+                resolve("fin2");
+            }
+        }, 1000)
+    });
+}
+
+
+
+function json_add_newdata(target_data, i, flag) {
+    var new_data = { id: i, flag: flag };
     target_data.push(new_data)
 
 }
 
-function json_delete_data(target_data, i){
+function json_delete_data(target_data, i) {
     delete target_data.splice(i, 1);
 }
 
