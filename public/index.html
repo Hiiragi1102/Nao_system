@@ -50,7 +50,7 @@
         <form name="form1">
             <div>
                 <div class="container">
-                    <textarea cols="100" rows="5" id="textarea1">私は宇宙人です。20光年かけて地球にやって来ました。宇宙には様々な宇宙人が住んでいます。</textarea>
+                    <textarea cols="100" rows="5" id="textarea1"></textarea>
                 </div>
             </div>
         </form>
@@ -70,13 +70,17 @@
             <h2>動作を選択してください</h2>
             <div>
                 <input type="radio" id="motion1" name="motion" value="motion1" checked>
-                <label for="motion1">指差し</label>
-
+                <label for="motion1">上段指差し</label>
                 <input type="radio" id="motion2" name="motion" value="motion2">
-                <label for="motion2">視線</label>
-
+                <label for="motion2">中段指差し</label>
                 <input type="radio" id="motion3" name="motion" value="motion3">
-                <label for="motion3">指差し＋視線</label>
+                <label for="motion3">下段指差し</label><br>
+                <input type="radio" id="motion4" name="motion" value="motion4">
+                <label for="motion4">上段指差し＋視線</label>
+                <input type="radio" id="motion5" name="motion" value="motion5">
+                <label for="motion5">中段指差し＋視線</label>
+                <input type="radio" id="motion6" name="motion" value="motion6">
+                <label for="motion6">下段指差し＋視線</label>
                 <ul>
                     <button type="button" onclick="design()">デザイン</button>
                     <button type="button" onclick="design_cancel()">キャンセル</button>
@@ -130,13 +134,17 @@
 
         function save() {
             console.log("save");
+            let element = document.getElementById('textarea1');
+            let textdata = element.value;
             deform_class()
-            let data = tojson();
-            socket.emit("jsonSave", data);
+            let jsondata = tojson();
+            let jdata = rjson();
+            console.log(mode);
+            socket.emit("jsonSave", jsondata, textdata, jdata, mode);
         }
         function play() {
             console.log("play");
-            socket.emit("moveNao");
+            socket.emit("moveNao", mode);
         }
     </script>
     <!----- /main ----->

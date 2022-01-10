@@ -3,19 +3,12 @@ from naoqi import ALProxy
 import sys
 import time
 
-
-# names = list()
-# times = list()
-# keys = list()
+Nao_ip = "192.168.1.12"
 data = sys.stdin.readline()
-
 print(data)
 
 try:
-  # motion = ALProxy("ALMotion", "192.168.1.19", 9559)
-  # motion.post.angleInterpolation(names, keys, times, True)
-  tts = ALProxy("ALTextToSpeech", "192.168.1.12", 9559)
-  # time.sleep(0.6)
+  tts = ALProxy("ALTextToSpeech", Nao_ip, 9559)
   tts.say(data)
   print("spoken")
 
