@@ -12,7 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-const sleep = ms => new Promise(res => setTimeout(res, ms));
+const sleep = ms => new Promise(res => setTimeout(res, ms));//デバック
 
 const options = {
     mode: 'text', // textもしくはjson
@@ -24,6 +24,15 @@ app.use(index);
 app.use(express.static(path.join(__dirname, 'public')));
 
 io.sockets.on('connection', function (socket) {
+    socket.emit("checkmode")
+    socket.on('returnmode', (mode) => {
+        const data = fs.readFileSync('./data/text/' + mode + '.txt', "utf-8", function (err, result) {
+            if (err) console.log('error', err);
+        });
+        console.log(data)
+        const jsondata = JSON.parse(fs.readFileSync('./data/json/' + mode + '.json', 'utf-8'));
+        socket.emit("senddata", data, jsondata);
+    })
     socket.on('jsonSave', (data) => {
         console.log("CHANGE TEXT")
         fs.writeFileSync('data/json/slide1.json', data, (err) => {
@@ -57,7 +66,6 @@ async function run_Nao() {
 async function nao_motion(i, motion) {
     const jsonslide = JSON.parse(fs.readFileSync('./data/json/slide1.json', 'utf-8'));
     const pyshell = new PythonShell('./public/python/' + motion + '.py', options);
-    const jsonslide = JSON.parse(fs.readFileSync('./data/json/slide1.json', 'utf-8'));
     const text = jsonslide[i].text;
     const num = jsonslide[i].end - jsonslide[i].start + 1;
     let spokenflag = false;
@@ -79,7 +87,7 @@ async function nao_motion(i, motion) {
                 clearInterval(timer);
                 resolve("fin1");
             }
-        },500)
+        }, 500)
     });
 }
 
@@ -113,18 +121,6 @@ async function nao_motion(i, motion) {
 //         }, 1000)
 //     });
 // }
-
-
-
-function json_add_newdata(target_data, i, flag) {
-    var new_data = { id: i, flag: flag };
-    target_data.push(new_data)
-
-}
-
-function json_delete_data(target_data, i) {
-    delete target_data.splice(i, 1);
-}
 
 
 server.listen(port, hostname, () => {

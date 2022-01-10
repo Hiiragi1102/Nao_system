@@ -11,6 +11,10 @@ class Nao_design {
 let nao_design = [];
 let nao_deform = [];
 
+function loaddata(jsondata){
+    nao_design = jsondata;
+}
+
 function design() {
     var element = document.getElementById("textarea1");
     var str = element.value;
@@ -43,7 +47,7 @@ function addMark(str, start, end) {
             checkValue_motion = motionRadio.item(i).value;
         }
     }
-    nao_design.push(new Nao_design(start - Mark_num, end - 1 - Mark_num, "", checkValue_intention, checkValue_motion));
+    nao_design.push(new Nao_design(start - Mark_num, end - 1 - Mark_num, "", checkValue_intention, checkValue_motion));//keep_mark_val_deleteようにend-2
     nao_design.sort(compare);
     return res;
 };
@@ -54,7 +58,6 @@ function Mark_count(num) {
     var Mark_num = 0;
     for (var i = 0; i < num; i++) {
         if (val[i] == "\u2063" || val[i] == "\u2064") {
-            console.log("a");
             Mark_num++;
         }
     }
@@ -90,7 +93,6 @@ function deform_class() {
     var length = val.length;
     var i = 0, j = 0, n = 0;
     nao_deform = [];
-    console.log("a");
     for (i = 0; i < length; i++) {
         console.log("b");
         //0から意図があった場合はあと
@@ -104,7 +106,6 @@ function deform_class() {
             n = i + 1;
             j++;
         } else if (i == nao_design[j].start) {
-            console.log("c");
             nao_deform.push(new Nao_design(n, i - 1, val.substring(n, i), "", ""));
             nao_deform.push(new Nao_design(nao_design[j].start, nao_design[j].end, val.substring(nao_design[j].start, nao_design[j].end + 1), nao_design[j].inte, nao_design[j].motion));
             i = nao_design[j].end;
@@ -152,13 +153,37 @@ function tojson() {
                     return this.children('.Layer').html(html).end();
                 },
 
-                // changeval: function (oldval, curval) {
-                //     var oldlen = oldval.length;
-                //     var curlen = curval.length;
-                //     if (oldlen - curlen > 0) {
-
-                //     }
-                // },
+                changeval: function (oldval, curval) {
+                    var element = document.getElementById("textarea1");
+                    var start = element.selectionStart;
+                    var oldlen = oldval.length;
+                    var curlen = curval.length;
+                    var len = oldlen - curlen;
+                    var mark_num = Mark_count(start);
+                    var json_len = nao_design.length;
+                    var flag = false;
+                    var j = 0;
+                    len = oldlen - curlen
+                    while (curval[j] == oldval[j] && j < oldlen && j < curlen) {
+                        if (curval[j] != oldval[j] && curval[j] == "\u2063") {
+                            flag = true;
+                            break;
+                        }
+                        j++;
+                    }
+                    if (flag == false) {
+                        for (let i = 0; i < json_len; i++) {
+                            if (nao_design[i].start > start - mark_num) {
+                                console.log("change json1")
+                                nao_design[i].start = nao_design[i].start - len;
+                                nao_design[i].end = nao_design[i].end - len;
+                            } else if (nao_design[i].start < start - mark_num && start - mark_num < nao_design[i].end) {
+                                console.log("change json2")
+                                nao_design[i].end = nao_design[i].end - len;
+                            }
+                        }
+                    }
+                },
 
                 deleteMark: function () {
                     var i = 0, j = 0;
@@ -170,21 +195,19 @@ function tojson() {
                             j = i;
                             i++;
                             if (val[i] == "\u2064" && flag == 0) {
-                                console.log("a");
                                 $elem.val(val.slice(0, j) + val.slice(i + 1));
                                 break;
                             }
                             while (val[i] != "\u2064") {
                                 if (val[i] == "\u2063" || i >= val_len) {
                                     var M_D_F = disp();
-                                    console.log(M_D_F)
                                     if (M_D_F == 1) {
                                         i = i - 1;
+                                        nao_design = nao_design.filter((nao_design) => (nao_design.start != j - Mark_count(j)));
                                         $elem.val(val.slice(0, j) + val.slice(j + 1));
                                         break;
                                     } else {
                                         var end = $elem.get(0).selectionEnd;
-                                        console.log(end);
                                         $elem.val(val.slice(0, end) + "\u2064" + val.slice(end));
                                         break;
                                     }
@@ -196,14 +219,12 @@ function tojson() {
                             }
                         } else if (val[i] == "\u2064") {
                             var M_D_F = disp();
-                            console.log(i)
-                            console.log(M_D_F)
                             if (M_D_F == 1) {
+                                nao_design = nao_design.filter((nao_design) => (nao_design.end != i - Mark_count(i) + 1));
                                 $elem.val(val.slice(0, i) + val.slice(i + 1));
                                 break;
                             } else {
                                 var start = $elem.get(0).selectionStart;
-                                console.log(start);
                                 $elem.val(val.slice(0, start) + "\u2063" + val.slice(start));
                                 i++;
                                 break;
@@ -222,15 +243,8 @@ function tojson() {
                 var curval = $elem.val();
                 if (curval !== oldval) {
                     $div.deleteMark();
-                    // $div.changeval(oldval, curval);
                     $div.refresh();
-                    oldval = curval;
-                }
-            },
-            update2: function () {
-                var curval = $elem.val();
-                if (curval !== oldval) {
-                    $div.refresh();
+                    $div.changeval(oldval, curval);
                     oldval = curval;
                 }
             }
@@ -245,7 +259,6 @@ function tojson() {
             $.each(events, function (i, evt) {
                 $elem.on(evt + evtsuffix, $.proxy(layer.update, layer));
             });
-
 
             // リサイズではなく、高さを自動拡張する
             $elem.on('scroll' + evtsuffix, function () {
@@ -272,6 +285,15 @@ function tojson() {
     };
 
 })(jQuery);
+
+function keep_mark_val_delete() {
+    for (let i = 0; i < json_len; i++) {
+        if (nao_design[i].start > start) {
+            nao_design[i].star - len;
+            nao_design[i].end - len;
+        }
+    }
+}
 
 const randomId = (randomLength, prefix, suffix) => {
     prefix = prefix === undefined ? '' : prefix;
