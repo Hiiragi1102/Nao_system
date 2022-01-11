@@ -1,14 +1,3 @@
-// class Nao_design {
-//     constructor(start, end, text, inte, motion) { /* コンストラクタ */
-//         this.start = start
-//         this.end = end
-//         this.text = text
-//         this.inte = inte
-//         this.motion = motion
-//     }
-// }
-const sleep = ms => new Promise(res => setTimeout(res, ms));//デバック
-
 let nao_design = [];
 let nao_deform = [];
 
@@ -50,7 +39,6 @@ function addMark(str, start, end) {
             checkValue_motion = motionRadio.item(i).value;
         }
     }
-    //nao_design.push(new Nao_design(start - Mark_num, end - 1 - Mark_num, "", checkValue_intention, checkValue_motion));//keep_mark_val_deleteようにend-2
     nao_design.push({ "start": start - Mark_num, "end": end - 1 - Mark_num, "text": "", "inte": checkValue_intention, "motion": checkValue_motion });//keep_mark_val_deleteようにend-2
     nao_design.sort(compare);
     return res;
@@ -99,20 +87,16 @@ function deform_class() {
     nao_deform = [];
     for (i = 0; i < length; i++) {
         if (j == nao_design.length) {
-            //nao_deform.push(new Nao_design(i, length, val.substring(i, length + 1), "", ""));
             nao_deform.push({ "start": i, "end": length, "text": val.substring(i, length + 1), "inte": "", "motion": "" });
             i = length;
         }
         else if (i == 0 && i == nao_design[j].start) {
-            //nao_deform.push(new Nao_design(nao_design[j].start, nao_design[j].end, val.substring(nao_design[j].start, nao_design[j].end + 1), nao_design[j].inte, nao_design[j].motion));
             nao_deform.push({ "start": nao_design[j].start, "end": nao_design[j].end, "text": val.substring(nao_design[j].start, nao_design[j].end + 1), "inte": nao_design[j].inte, "motion": nao_design[j].motion });
             i = nao_design[j].end;
             n = i + 1;
             j++;
         } else if (i == nao_design[j].start) {
-            //nao_deform.push(new Nao_design(n, i - 1, val.substring(n, i), "", ""));
             nao_deform.push({ "start": n, "end": i - 1, "text": val.substring(n, i), "inte": "", "motion": "" });
-            //nao_deform.push(new Nao_design(nao_design[j].start, nao_design[j].end, val.substring(nao_design[j].start, nao_design[j].end + 1), nao_design[j].inte, nao_design[j].motion));
             nao_deform.push({ "start": nao_design[j].start, "end": nao_design[j].end, "text": val.substring(nao_design[j].start, nao_design[j].end + 1), "inte": nao_design[j].inte, "motion": nao_design[j].motion });
             i = nao_design[j].end;
             n = i + 1;
@@ -129,6 +113,20 @@ function rjson() {
 function tojson() {
     const data = JSON.stringify(nao_deform);
     return data;
+}
+
+function update() {
+    $('.list').html(function () {
+        let i = 0;
+        let data = "";
+        while (i < nao_deform.length){
+            if (nao_deform[i].motion != "") {
+                data = data + '<li>' + nao_deform[i].text + ':' + nao_deform[i].inte + '*' + nao_deform[i].motion + '</li>';
+            }
+            i++;
+        }
+        return data;
+    })
 }
 
 (function ($) {
@@ -176,25 +174,19 @@ function tojson() {
                     var j = 0;
                     len = oldlen - curlen
                     while (j < oldlen && j < curlen) {
-                        console.log(oldval[j]);
-                        console.log(curval[j]);
                         if (curval[j] != oldval[j] && curval[j] == "\u2063") {
                             flag = false;
 
                             break;
                         }
-                        console.log(flag);
                         j++;
                     }
-                    console.log(flag);
                     if (flag == true) {
                         for (let i = 0; i < json_len; i++) {
                             if (nao_design[i].start > start - mark_num) {
-                                console.log("change json1")
                                 nao_design[i].start = nao_design[i].start - len;
                                 nao_design[i].end = nao_design[i].end - len;
                             } else if (nao_design[i].start < start - mark_num && start - mark_num < nao_design[i].end) {
-                                console.log("change json2")
                                 nao_design[i].end = nao_design[i].end - len;
                             }
                         }

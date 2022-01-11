@@ -1,0 +1,21 @@
+ul.list{
+  font: 14px/1.6 'arial narrow', sans-serif;
+  padding: 10px 10px 20px;
+  color: #448ccb;
+  background: #ecf3fa;
+  border: solid 2px #adcce8;
+  border-radius: 5px;
+  list-style: none;
+}
+ul.list li{
+  position: relative;
+  line-height: 30px;
+  padding-left: 20px;
+  font-weight: bold;
+  border-bottom: dashed 1px #448ccb;
+}
+ul.list li:before{
+  content: "・";
+  position: absolute;
+  left: 0px;
+}

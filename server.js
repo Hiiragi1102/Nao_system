@@ -29,7 +29,6 @@ io.sockets.on('connection', function (socket) {
         const data = fs.readFileSync('./data/text/' + mode + '.txt', "utf-8", function (err, result) {
             if (err) console.log('error', err);
         });
-        console.log(data)
         const jdata = fs.readFileSync('./data/json/' + mode + '_tent.json', 'utf-8');
         let jsondata ="";
         if (jdata != "") {
@@ -38,7 +37,6 @@ io.sockets.on('connection', function (socket) {
         socket.emit("senddata", data, jsondata);
     })
     socket.on('jsonSave', (jsondata, textdata, jdata, mode) => {
-        console.log("CHANGE TEXT")
         fs.writeFileSync('./data/json/' + mode + '.json', jsondata, (err) => {
             if (err) throw err;
             console.log('false');
@@ -63,29 +61,21 @@ async function run_Nao(mode) {
     let i = 0;
     let motion;
     const jsonslide = JSON.parse(fs.readFileSync('./data/json/' + mode + '.json', 'utf-8'));
-    console.log(motion);
     for await (let obj of jsonslide) {
         if (obj.motion == "") {
             motion = "speak";
-            console.log(motion);
         } else if (obj.motion == "motion1") {
             motion = "motion1";
-            console.log(motion);
         } else if (obj.motion == "motion2") {
             motion = "motion2";
-            console.log(motion);
         } else if (obj.motion == "motion3") {
             motion = "motion3";
-            console.log(motion);
         } else if (obj.motion == "motion4") {
             motion = "motion4";
-            console.log(motion);
         } else if (obj.motion == "motion5") {
             motion = "motion5";
-            console.log(motion);
         } else if (obj.motion == "motion6") {
             motion = "motion6";
-            console.log(motion);
         }
         await nao_motion(i, motion, mode);
         i++;
@@ -98,7 +88,6 @@ async function nao_motion(i, motion, mode) {
     const text = jsonslide[i].text;
     const num = jsonslide[i].end - jsonslide[i].start + 1;
     let spokenflag = false;
-    console.log(text);
     pyshell.send(text);
     pyshell.on('message', function (data) {
         data = data.replace(/\r?\n/g, '');
@@ -109,9 +98,9 @@ async function nao_motion(i, motion, mode) {
     });
     return new Promise(resolve => {
         const timer = setInterval(() => {
-            console.log("loop1:" + spokenflag);
+            //console.log("loop1:" + spokenflag);
             if (spokenflag) {
-                console.log("clear");
+                //console.log("clear");
                 clearInterval(timer);
                 resolve("fin1");
             }

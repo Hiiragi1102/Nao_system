@@ -11,12 +11,13 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/hashtag.css">
     <link rel="stylesheet" href="css/backbtn.css">
+    <link rel="stylesheet" href="css/list.css">
     <link rel="stylesheet" href="css/contextmenu.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="python/libqi-js/libs/qimessaging/1.0/qimessaging.js"></script>
 
 
-    <script src="js/backbtn.js"></script>
+    <script src="js/main.js"></script>
     <script src="js/sort.js"></script>
 
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
@@ -104,7 +105,12 @@
     <section>
         <button onclick="location.href='slide2.html'">スライド２</button>
         <button onclick="location.href='slide3.html'">スライド３</button>
+        <button onclick="location.href='slide4.html'">スライド４</button>
+        <button onclick="location.href='slide5.html'">スライド５</button>
     </section>
+
+    <ul class="list">
+    </ul>
 
     <script>
         jQuery(function () {
@@ -127,23 +133,20 @@
 
         socket.on('senddata', (data, jsondata) => {
             let element = document.getElementById('textarea1');
-            console.log(data);
             element.value = data;
             loaddata(jsondata);
         })
 
         function save() {
-            console.log("save");
             let element = document.getElementById('textarea1');
             let textdata = element.value;
             deform_class()
             let jsondata = tojson();
             let jdata = rjson();
-            console.log(mode);
+            update();
             socket.emit("jsonSave", jsondata, textdata, jdata, mode);
         }
         function play() {
-            console.log("play");
             socket.emit("moveNao", mode);
         }
     </script>
