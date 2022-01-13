@@ -59,17 +59,28 @@
         <div id="contextmenu">
             <h2>意図を選択してください</h2>
             <div>
-                <input type="radio" id="intention1" name="intention" value="int1" checked>
+                <input type="radio" id="intention1" name="intention" value="注意喚起" checked>
                 <label for="intention1">注意喚起</label>
 
-                <input type="radio" id="intention2" name="intention" value="int2">
+                <input type="radio" id="intention2" name="intention" value="注意誘導">
                 <label for="intention2">注意誘導</label>
 
-                <input type="radio" id="intention3" name="intention" value="int3">
+                <input type="radio" id="intention3" name="intention" value="注意喚起＋誘導">
                 <label for="intention3">注意喚起＋誘導</label>
+            </div>
+            <h2>話し方を選択してください</h2>
+            <div>
+                <input type="radio" id="para1" name="para" value="デフォルト" checked>
+                <label for="intention1">デフォルト</label>
+
+                <input type="radio" id="para2" name="para" value="強調">
+                <label for="intention2">強調</label>
+
             </div>
             <h2>動作を選択してください</h2>
             <div>
+                <input type="radio" id="motion0" name="motion" value="" checked>
+                <label for="motion1">なし</label>
                 <input type="radio" id="motion1" name="motion" value="motion1" checked>
                 <label for="motion1">上段指差し</label>
                 <input type="radio" id="motion2" name="motion" value="motion2">
@@ -77,11 +88,11 @@
                 <input type="radio" id="motion3" name="motion" value="motion3">
                 <label for="motion3">下段指差し</label><br>
                 <input type="radio" id="motion4" name="motion" value="motion4">
-                <label for="motion4">上段指差し＋視線</label>
+                <label for="motion4">上段指差し＋顔向け</label>
                 <input type="radio" id="motion5" name="motion" value="motion5">
-                <label for="motion5">中段指差し＋視線</label>
+                <label for="motion5">中段指差し＋顔向け</label>
                 <input type="radio" id="motion6" name="motion" value="motion6">
-                <label for="motion6">下段指差し＋視線</label>
+                <label for="motion6">下段指差し＋顔向け</label>
                 <ul>
                     <button type="button" onclick="design()">デザイン</button>
                     <button type="button" onclick="design_cancel()">キャンセル</button>

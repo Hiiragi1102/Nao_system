@@ -30,7 +30,7 @@ io.sockets.on('connection', function (socket) {
             if (err) console.log('error', err);
         });
         const jdata = fs.readFileSync('./data/json/' + mode + '_tent.json', 'utf-8');
-        let jsondata ="";
+        let jsondata = "";
         if (jdata != "") {
             jsondata = JSON.parse(jdata);
         }
@@ -53,7 +53,6 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('moveNao', (mode) => {
         run_Nao(mode)
-        console.log(mode);
     })
 });
 
@@ -86,10 +85,17 @@ async function nao_motion(i, motion, mode) {
     const jsonslide = JSON.parse(fs.readFileSync('./data/json/' + mode + '.json', 'utf-8'));
     const pyshell = new PythonShell('./public/python/' + motion + '.py', options);
     const text = jsonslide[i].text;
-    const num = jsonslide[i].end - jsonslide[i].start + 1;
+    const para = jsonslide[i].para;
+    let vol = 0;
     let spokenflag = false;
-    pyshell.send(text);
+    if (para=="emphasis"){
+        vol = 1;
+    }else if(para=="default"){
+        vol = 0.5;
+    }
+    pyshell.send(text + "*" + vol);
     pyshell.on('message', function (data) {
+        console.log(data);
         data = data.replace(/\r?\n/g, '');
         if (data == "spoken") {
             spokenflag = true;
