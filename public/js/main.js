@@ -137,9 +137,9 @@ function update() {
         let data = "";
         let motion = "";
         while (i < nao_deform.length) {
-            if (nao_deform[i].motion != "") {
+            if (nao_deform[i].inte != "") {
                 if (nao_deform[i].motion == "") {
-                    motion = "なし";
+                    motion = "動作なし";
                 } else if (nao_deform[i].motion == "motion1" || nao_deform[i].motion == "motion6") {
                     motion = "上段指さし";
                 } else if (nao_deform[i].motion == "motion2" || nao_deform[i].motion == "motion7") {

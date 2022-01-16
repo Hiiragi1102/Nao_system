@@ -73,15 +73,15 @@ async function run_Nao(mode, id) {
             motion = "motion4";
         } else if (obj.motion == "motion5" && obj.face == "顔向けなし") {
             motion = "motion5";
-        } else if (obj.motion == "motion6" && obj.face == "顔向けあり") {
+        } else if (obj.motion == "motion1" && obj.face == "顔向けあり") {
             motion = "motion6";
-        } else if (obj.motion == "motion7" && obj.face == "顔向けあり") {
+        } else if (obj.motion == "motion2" && obj.face == "顔向けあり") {
             motion = "motion7";
-        } else if (obj.motion == "motion8" && obj.face == "顔向けあり") {
+        } else if (obj.motion == "motion3" && obj.face == "顔向けあり") {
             motion = "motion8";
-        } else if (obj.motion == "motion9" && obj.face == "顔向けあり") {
+        } else if (obj.motion == "motion4" && obj.face == "顔向けあり") {
             motion = "motion9";
-        } else if (obj.motion == "motion10" && obj.face == "顔向けあり") {
+        } else if (obj.motion == "motion5" && obj.face == "顔向けあり") {
             motion = "motion10";
         } else if (obj.motion == "motion11") {
             motion = "motion11";
@@ -96,12 +96,13 @@ async function nao_motion(i, motion, mode, id) {
     const pyshell = new PythonShell('./public/python/' + motion + '.py', options);
     const text = jsonslide[i].text;
     const para = jsonslide[i].para;
+    console.log(motion);
     let vol = 0;
     let spokenflag = false;
-    if (para == "emphasis") {
-        vol = 1;
-    } else if (para == "default") {
-        vol = 0.5;
+    if (para == "強調") {
+        vol = 0.9;
+    } else if (para == "デフォルト" || para == "") {
+        vol = 0.3;
     }
     pyshell.send(text + "*" + vol);
     pyshell.on('message', function (data) {
