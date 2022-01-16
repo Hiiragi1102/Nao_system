@@ -151,7 +151,7 @@ function update() {
                 } else if (nao_deform[i].motion == "motion5" || nao_deform[i].motion == "motion10") {
                     motion = "奥指差し";
                 } else if (nao_deform[i].motion == "motion11") {
-                    motion = "動作強調";
+                    motion = "強調動作";
                 }
                 data = data + '<li>' + nao_deform[i].text + ':' + nao_deform[i].inte + '*' + nao_deform[i].para + '*' + nao_deform[i].face + '*' + motion + '</li>';
             }
