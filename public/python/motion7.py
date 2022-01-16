@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# 上段指さし+顔向け
+# 中段指さし+顔向け
 
 from naoqi import ALProxy
 import sys

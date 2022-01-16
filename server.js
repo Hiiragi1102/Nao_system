@@ -25,72 +25,82 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 io.sockets.on('connection', function (socket) {
     socket.emit("checkmode")
-    socket.on('returnmode', (mode) => {
-        const data = fs.readFileSync('./data/text/' + mode + '.txt', "utf-8", function (err, result) {
+    socket.on('returnmode', (mode, id) => {
+        const data = fs.readFileSync('./data/' + id + '/text/' + mode + '.txt', "utf-8", function (err, result) {
             if (err) console.log('error', err);
         });
-        const jdata = fs.readFileSync('./data/json/' + mode + '_tent.json', 'utf-8');
+        const jdata = fs.readFileSync('./data/' + id + '/json/' + mode + '_tent.json', 'utf-8');
         let jsondata = "";
         if (jdata != "") {
             jsondata = JSON.parse(jdata);
         }
         socket.emit("senddata", data, jsondata);
     })
-    socket.on('jsonSave', (jsondata, textdata, jdata, mode) => {
-        fs.writeFileSync('./data/json/' + mode + '.json', jsondata, (err) => {
+    socket.on('jsonSave', (jsondata, textdata, jdata, mode, id) => {
+        fs.writeFileSync('./data/' + id + '/json/' + mode + '.json', jsondata, (err) => {
             if (err) throw err;
             console.log('false');
         });
-        fs.writeFileSync('./data/json/' + mode + '_tent.json', jdata, (err) => {
+        fs.writeFileSync('./data/' + id + '/json/' + mode + '_tent.json', jdata, (err) => {
             if (err) throw err;
             console.log('false');
         });
-        fs.writeFileSync('./data/text/' + mode + '.txt', textdata, (err) => {
+        fs.writeFileSync('./data/' + id + '/text/' + mode + '.txt', textdata, (err) => {
             if (err) throw err;
             console.log('false');
         });
     })
 
-    socket.on('moveNao', (mode) => {
-        run_Nao(mode)
+    socket.on('moveNao', (mode, id) => {
+        run_Nao(mode, id)
     })
 });
 
-async function run_Nao(mode) {
+async function run_Nao(mode, id) {
     let i = 0;
     let motion;
-    const jsonslide = JSON.parse(fs.readFileSync('./data/json/' + mode + '.json', 'utf-8'));
+    const jsonslide = JSON.parse(fs.readFileSync('./data/' + id + '/json/' + mode + '.json', 'utf-8'));
     for await (let obj of jsonslide) {
         if (obj.motion == "") {
             motion = "speak";
-        } else if (obj.motion == "motion1") {
+        } else if (obj.motion == "motion1" && obj.face == "顔向けなし") {
             motion = "motion1";
-        } else if (obj.motion == "motion2") {
+        } else if (obj.motion == "motion2" && obj.face == "顔向けなし") {
             motion = "motion2";
-        } else if (obj.motion == "motion3") {
+        } else if (obj.motion == "motion3" && obj.face == "顔向けなし") {
             motion = "motion3";
-        } else if (obj.motion == "motion4") {
+        } else if (obj.motion == "motion4" && obj.face == "顔向けなし") {
             motion = "motion4";
-        } else if (obj.motion == "motion5") {
+        } else if (obj.motion == "motion5" && obj.face == "顔向けなし") {
             motion = "motion5";
-        } else if (obj.motion == "motion6") {
+        } else if (obj.motion == "motion6" && obj.face == "顔向けあり") {
             motion = "motion6";
+        } else if (obj.motion == "motion7" && obj.face == "顔向けあり") {
+            motion = "motion7";
+        } else if (obj.motion == "motion8" && obj.face == "顔向けあり") {
+            motion = "motion8";
+        } else if (obj.motion == "motion9" && obj.face == "顔向けあり") {
+            motion = "motion9";
+        } else if (obj.motion == "motion10" && obj.face == "顔向けあり") {
+            motion = "motion10";
+        } else if (obj.motion == "motion11") {
+            motion = "motion11";
         }
-        await nao_motion(i, motion, mode);
+        await nao_motion(i, motion, mode, id);
         i++;
     }
 }
 
-async function nao_motion(i, motion, mode) {
-    const jsonslide = JSON.parse(fs.readFileSync('./data/json/' + mode + '.json', 'utf-8'));
+async function nao_motion(i, motion, mode, id) {
+    const jsonslide = JSON.parse(fs.readFileSync('./data/' + id + '/json/' + mode + '.json', 'utf-8'));
     const pyshell = new PythonShell('./public/python/' + motion + '.py', options);
     const text = jsonslide[i].text;
     const para = jsonslide[i].para;
     let vol = 0;
     let spokenflag = false;
-    if (para=="emphasis"){
+    if (para == "emphasis") {
         vol = 1;
-    }else if(para=="default"){
+    } else if (para == "default") {
         vol = 0.5;
     }
     pyshell.send(text + "*" + vol);

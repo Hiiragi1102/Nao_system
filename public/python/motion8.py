@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# 上段指さし+顔向け
+# 下段指さし+顔向け
 
 from naoqi import ALProxy
 import sys
@@ -19,6 +19,7 @@ num = len(text)/20
 if(num>3):
     num = 3
 
+
 names.append("HeadYaw")
 times.append([0.5, 1.5, 1.5+num, 4.0+num])
 keys.append([-0.5, -1.0, -1.0, 0.0])
@@ -36,7 +37,7 @@ times.append([1.5, 1.5+num, 4.0+num])
 keys.append([-0.5, -0.5, 1.5])
 
 names.append("RShoulderRoll")
-times.append([1.5, 1.5+num, 4.0+num])
+times.append(1.5, 1.5+num, 4.0+num])
 keys.append([-1.0, -1.0, 0.0])
 
 try:

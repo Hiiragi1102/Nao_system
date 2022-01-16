@@ -23,12 +23,15 @@ function addMark(str, start, end) {
     var res = str.slice(0, start) + "\u2063" + str.slice(start);
     var intentionRadio = document.getElementsByName('intention');
     var motionRadio = document.getElementsByName('motion');
+    var faceRadio = document.getElementsByName('face');
     var paraRadio = document.getElementsByName('para');
     let intentionLen = intentionRadio.length;
     let motionLen = motionRadio.length;
+    let faceLen = faceRadio.length;
     let paraLen = paraRadio.length;
     var checkValue_intention = '';
     var checkValue_motion = '';
+    var checkValue_face = '';
     var checkValue_para = '';
     res = res.slice(0, end + 1) + "\u2064" + res.slice(end + 1);
     Mark_num = Mark_count(start);
@@ -42,12 +45,17 @@ function addMark(str, start, end) {
             checkValue_motion = motionRadio.item(i).value;
         }
     }
+    for (var i = 0; i < faceLen; i++) {
+        if (faceRadio.item(i).checked) {
+            checkValue_face = faceRadio.item(i).value;
+        }
+    }
     for (var i = 0; i < paraLen; i++) {
         if (paraRadio.item(i).checked) {
             checkValue_para = paraRadio.item(i).value;
         }
     }
-    nao_design.push({ "start": start - Mark_num, "end": end - 1 - Mark_num, "text": "", "inte": checkValue_intention, "motion": checkValue_motion, "para": checkValue_para });//keep_mark_val_deleteようにend-2
+    nao_design.push({ "start": start - Mark_num, "end": end - 1 - Mark_num, "text": "", "inte": checkValue_intention, "motion": checkValue_motion, "face": checkValue_face, "para": checkValue_para });//keep_mark_val_deleteようにend-2
     nao_design.sort(compare);
     return res;
 };
@@ -95,17 +103,17 @@ function deform_class() {
     nao_deform = [];
     for (i = 0; i < length; i++) {
         if (j == nao_design.length) {
-            nao_deform.push({ "start": i, "end": length, "text": val.substring(i, length + 1), "inte": "", "motion": "", "para": "" });
+            nao_deform.push({ "start": i, "end": length, "text": val.substring(i, length + 1), "inte": "", "motion": "", "face": "", "para": "" });
             i = length;
         }
         else if (i == 0 && i == nao_design[j].start) {
-            nao_deform.push({ "start": nao_design[j].start, "end": nao_design[j].end, "text": val.substring(nao_design[j].start, nao_design[j].end + 1), "inte": nao_design[j].inte, "motion": nao_design[j].motion, "para": nao_design[j].para });
+            nao_deform.push({ "start": nao_design[j].start, "end": nao_design[j].end, "text": val.substring(nao_design[j].start, nao_design[j].end + 1), "inte": nao_design[j].inte, "motion": nao_design[j].motion, "face": nao_design[j].face, "para": nao_design[j].para });
             i = nao_design[j].end;
             n = i + 1;
             j++;
         } else if (i == nao_design[j].start) {
-            nao_deform.push({ "start": n, "end": i - 1, "text": val.substring(n, i), "inte": "", "motion": "", "para": "" });
-            nao_deform.push({ "start": nao_design[j].start, "end": nao_design[j].end, "text": val.substring(nao_design[j].start, nao_design[j].end + 1), "inte": nao_design[j].inte, "motion": nao_design[j].motion, "para": nao_design[j].para });
+            nao_deform.push({ "start": n, "end": i - 1, "text": val.substring(n, i), "inte": "", "motion": "", "face": "", "para": "" });
+            nao_deform.push({ "start": nao_design[j].start, "end": nao_design[j].end, "text": val.substring(nao_design[j].start, nao_design[j].end + 1), "inte": nao_design[j].inte, "motion": nao_design[j].motion, "face": nao_design[j].face, "para": nao_design[j].para });
             i = nao_design[j].end;
             n = i + 1;
             j++;
@@ -132,20 +140,20 @@ function update() {
             if (nao_deform[i].motion != "") {
                 if (nao_deform[i].motion == "") {
                     motion = "なし";
-                } else if (nao_deform[i].motion == "motion1") {
-                    motion = "上段指差し";
-                } else if (nao_deform[i].motion == "motion2") {
-                    motion = "中段指差し";
-                } else if (nao_deform[i].motion == "motion3") {
+                } else if (nao_deform[i].motion == "motion1" || nao_deform[i].motion == "motion6") {
+                    motion = "上段指さし";
+                } else if (nao_deform[i].motion == "motion2" || nao_deform[i].motion == "motion7") {
+                    motion = "中段指さし";
+                } else if (nao_deform[i].motion == "motion3" || nao_deform[i].motion == "motion8") {
                     motion = "下段指差し";
-                } else if (nao_deform[i].motion == "motion4") {
-                    motion = "上段指差し＋顔向け";
-                } else if (nao_deform[i].motion == "motion5") {
-                    motion = "中段指差し＋顔向け";
-                } else if (nao_deform[i].motion == "motion6") {
-                    motion = "下段指差し＋顔向け";
+                } else if (nao_deform[i].motion == "motion4" || nao_deform[i].motion == "motion9") {
+                    motion = "手前指差し";
+                } else if (nao_deform[i].motion == "motion5" || nao_deform[i].motion == "motion10") {
+                    motion = "奥指差し";
+                } else if (nao_deform[i].motion == "motion11") {
+                    motion = "動作強調";
                 }
-                data = data + '<li>' + nao_deform[i].text + ':' + nao_deform[i].inte + '*' + nao_deform[i].para + '*' + motion + '</li>';
+                data = data + '<li>' + nao_deform[i].text + ':' + nao_deform[i].inte + '*' + nao_deform[i].para + '*' + nao_deform[i].face + '*' + motion + '</li>';
             }
             i++;
         }
